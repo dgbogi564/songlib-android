@@ -1,5 +1,6 @@
 package cs213.photos.model;
 
+import android.content.Context;
 import android.net.Uri;
 
 import androidx.annotation.NonNull;
@@ -13,11 +14,10 @@ import java.util.Calendar;
 public class Album implements Serializable {
 
     private static final DateFormat dateFormat = DateFormat.getDateInstance();
-    public static Album currentAlbum;
     public String name;
     public ArrayList<Photo> photos;
-    Calendar earliestDate = Calendar.getInstance();
-    Calendar latestDate = Calendar.getInstance();
+    private final Calendar earliestDate = Calendar.getInstance();
+    private final Calendar latestDate = Calendar.getInstance();
     private int size;
 
     public Album(String name) {
@@ -36,18 +36,34 @@ public class Album implements Serializable {
         calculateTimeStats();
     }
 
+    public void add(Context context, Uri uri) throws Exception {
+        if (get(uri.toString()) != null) {
+            throw new Exception("Photo already exists.");
+        }
+        this.photos.add(new Photo(context, uri));
+        size++;
+        calculateTimeStats();
+    }
+
     public void remove(Photo photo) {
+        if (size == 0) {
+            return;
+        }
         this.photos.remove(photo);
+        size--;
+        calculateTimeStats();
+    }
+    public void remove(int pos) {
+        if (size == 0) {
+            return;
+        }
+        this.photos.remove(pos);
         size--;
         calculateTimeStats();
     }
 
     public Photo get(String filepath) {
         return photos.stream().filter(p -> p.filepath.equals(filepath)).findFirst().orElse(null);
-    }
-
-    public Photo get(Uri uri) {
-        return photos.stream().filter(p -> p.filepath.equals(uri.toString())).findFirst().orElse(null);
     }
 
     public Photo get(int index) {

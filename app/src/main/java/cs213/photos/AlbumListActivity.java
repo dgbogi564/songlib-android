@@ -1,6 +1,8 @@
 package cs213.photos;
 
 import static cs213.photos.model.ErrorHandling.alertDialog;
+import static cs213.photos.model.State.currentAlbumList;
+import static cs213.photos.model.State.currentAlbum;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -23,18 +25,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import cs213.photos.model.Album;
 import cs213.photos.model.AlbumList;
 
 public class AlbumListActivity extends AppCompatActivity {
-
-    private static AlbumList albumList;
     private ListView listView;
 
     private ArrayAdapter<Album> listAdapter;
+    private AlbumList albumList;
+
     public static final String saveLocation = "photos.dat";
 
     @Override
@@ -45,7 +46,7 @@ public class AlbumListActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        albumList = AlbumList.load(getApplicationContext());
+        albumList = currentAlbumList = AlbumList.load(getApplicationContext());
 
         // Setup stock album
         Album album = new Album("Stock");
@@ -67,12 +68,12 @@ public class AlbumListActivity extends AppCompatActivity {
     }
 
     private void showAlbum(int pos) {
-        Album.currentAlbum = albumList.get(pos);
+        currentAlbum = albumList.get(pos);
         startActivity(new Intent(this, AlbumActivity.class));
     }
 
-    private void addAlbum() throws IOException {
-        Dialog dialog = new Dialog((AlbumListActivity.this));
+    private void addAlbum() {
+        Dialog dialog = new Dialog((this));
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setCancelable(true);
         dialog.setContentView(R.layout.add_album);
@@ -99,8 +100,8 @@ public class AlbumListActivity extends AppCompatActivity {
 
     }
 
-    private void deleteAlbum() throws IOException {
-        Dialog dialog = new Dialog((AlbumListActivity.this));
+    private void deleteAlbum() {
+        Dialog dialog = new Dialog((this));
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setCancelable(true);
         dialog.setContentView(R.layout.delete_album);
@@ -134,10 +135,6 @@ public class AlbumListActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 int i = idx.get();
-                if (albumList.get(i).name.equalsIgnoreCase("stock")) {
-                    errorText.setText("Cannot delete stock album");
-                    return;
-                }
                 albumList.remove(i);
                 albumList.save(getApplicationContext());
                 listAdapter.notifyDataSetChanged();
@@ -157,19 +154,14 @@ public class AlbumListActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
-        try {
-            if (itemId == R.id.album_add) {
-                addAlbum();
-                return true;
-            }
-            if (itemId == R.id.album_delete) {
-                deleteAlbum();
-                return true;
-            }
-        } catch (IOException e) {
-            alertDialog(this, e);
+        if (itemId == R.id.add) {
+            addAlbum();
+            return true;
         }
-
+        if (itemId == R.id.delete) {
+            deleteAlbum();
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 }

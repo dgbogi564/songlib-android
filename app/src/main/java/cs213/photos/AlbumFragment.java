@@ -1,5 +1,7 @@
 package cs213.photos;
 
+import static cs213.photos.model.State.currentAlbum;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import cs213.photos.model.Album;
 import cs213.photos.model.Photo;
+import cs213.photos.model.State;
 
 /**
  * A fragment representing a list of Items.
@@ -46,7 +49,7 @@ public class AlbumFragment extends Fragment {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            recyclerView.setAdapter(new AlbumAdapter(Album.currentAlbum, context, listener));
+            recyclerView.setAdapter(new AlbumAdapter(currentAlbum, listener));
         }
 
         return view;
