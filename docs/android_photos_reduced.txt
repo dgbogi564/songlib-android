@@ -1,0 +1,29 @@
+Android App for Photos - 1/2 work for full credit
+
+/15 Home Screen
+      /10 Display albums in list
+      /5 Persistence across multiple launches of app
+      
+ /20 Open,create,delete albums
+      /5 Open
+      /10 Create
+      /5 Delete
+
+ /20 Add,remove,display photo
+      /5 Add
+      /5 Remove
+      /10 Slideshow in display screen OR Display screen for single photo OR both
+
+ /10 Adding tag to photo
+
+ /10 Move photo to another album
+
+ /25 Search photos by tag
+       /5 Individually by person,location
+       /10 Conjunction: person and location
+       /10 Disjunction: person and location 
+       
+Total: /100
+
+
+

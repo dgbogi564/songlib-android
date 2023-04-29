@@ -36,15 +36,6 @@ public class Album implements Serializable {
         calculateTimeStats();
     }
 
-    public void add(Uri uri, InputStream is) throws Exception {
-        if (get(uri) != null) {
-            throw new Exception("Photo already exists.");
-        }
-        this.photos.add(new Photo(uri, is));
-        size++;
-        calculateTimeStats();
-    }
-
     public void remove(Photo photo) {
         this.photos.remove(photo);
         size--;
@@ -52,11 +43,11 @@ public class Album implements Serializable {
     }
 
     public Photo get(String filepath) {
-        return photos.stream().filter(p -> p.uri.toString().equals(filepath)).findFirst().orElse(null);
+        return photos.stream().filter(p -> p.filepath.equals(filepath)).findFirst().orElse(null);
     }
 
     public Photo get(Uri uri) {
-        return photos.stream().filter(p -> p.uri.equals(uri)).findFirst().orElse(null);
+        return photos.stream().filter(p -> p.filepath.equals(uri.toString())).findFirst().orElse(null);
     }
 
     public Photo get(int index) {

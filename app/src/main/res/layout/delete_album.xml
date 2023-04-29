@@ -11,15 +11,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:text="@string/add_album"
+        android:text="@string/delete_album"
         android:textColor="@color/black"
         android:textSize="24sp" />
 
-    <EditText
-        android:id="@+id/edit_text"
+    <Spinner
+        android:id="@+id/spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/name_label"
         android:imeOptions="actionNext"
         android:inputType="text" />
 
@@ -37,6 +36,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end"
         android:background="@color/primary"
-        android:text="@string/add"
+        android:text="@string/delete"
         android:textColor="@color/white" />
 </LinearLayout>

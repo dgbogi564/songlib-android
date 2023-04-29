@@ -4,11 +4,9 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -16,28 +14,23 @@ import java.util.Calendar;
 public class Photo implements Serializable {
 
     private static final DateFormat dateFormat = DateFormat.getDateInstance();
-    public Uri uri;
-    public Drawable drawable;
+
+    public String filepath;
     public String caption = "";
     public ArrayList<Tag> tags = new ArrayList<>();
     public Calendar date;
 
     public Photo(String filepath) throws Exception {
-        File file = new File(filepath);
-        if (!file.exists()) {
-            throw new Exception("Photo does not exist.");
+        this.filepath = filepath;
+        date = Calendar.getInstance();
+        if (!filepath.startsWith("file:///")) {
+            File file = new File(filepath);
+            if (!file.exists()) {
+                throw new Exception("Photo does not exist.");
+            }
+            date.setTimeInMillis(file.lastModified());
         }
-        this.uri = Uri.parse(filepath);
-        this.drawable = Drawable.createFromStream(Files.newInputStream(file.toPath()), null);
-        date = Calendar.getInstance();
-        date.setTimeInMillis(file.lastModified());
         date.set(Calendar.MILLISECOND, 0);
-    }
-
-    public Photo(Uri uri, InputStream is) {
-        this.uri = uri;
-        this.drawable = Drawable.createFromStream(is, null);
-        date = Calendar.getInstance();
     }
 
     public void addTag(Tag.Type type, String value) throws Exception {
@@ -76,7 +69,7 @@ public class Photo implements Serializable {
     }
 
     public boolean equals(Photo photo) {
-        return this.uri.equals(photo.uri);
+        return this.filepath.equals(photo.filepath);
     }
 
     public String getDate() {

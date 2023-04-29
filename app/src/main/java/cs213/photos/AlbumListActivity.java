@@ -1,26 +1,30 @@
 package cs213.photos;
 
+import static cs213.photos.model.ErrorHandling.alertDialog;
+
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.AssetManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import cs213.photos.model.Album;
 import cs213.photos.model.AlbumList;
@@ -29,7 +33,9 @@ public class AlbumListActivity extends AppCompatActivity {
 
     private static AlbumList albumList;
     private ListView listView;
-    private static final String saveLocation = "photos.dat";
+
+    private ArrayAdapter<Album> listAdapter;
+    public static final String saveLocation = "photos.dat";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,23 +45,14 @@ public class AlbumListActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Load/create album
-        try (FileInputStream fis = openFileInput(saveLocation);
-             ObjectInputStream ois = new ObjectInputStream(fis)) {
-            albumList = (cs213.photos.model.AlbumList) ois.readObject();
-            albumList.remove("Stock");
-        } catch (IOException | ClassNotFoundException e) {
-            albumList = new AlbumList();
-        }
+        albumList = AlbumList.load(getApplicationContext());
 
         // Setup stock album
         Album album = new Album("Stock");
         try {
             AssetManager assets = getAssets();
             for (String path : assets.list("photos")) {
-
-                album.add(Uri.parse("file:///android_asset/photos/" + path),
-                        assets.open("photos/" + path));
+                album.add("file:///android_asset/photos/" + path);
             }
             albumList.add(album);
         } catch (Exception e) {
@@ -64,7 +61,8 @@ public class AlbumListActivity extends AppCompatActivity {
 
         // Setup list view
         listView = findViewById(R.id.listView);
-        listView.setAdapter(new ArrayAdapter<>(this, R.layout.album_list_item, albumList.list));
+        listAdapter = new ArrayAdapter<>(this, R.layout.album_list_item, albumList.list);
+        listView.setAdapter(listAdapter);
         listView.setOnItemClickListener((list, view, pos, id) -> showAlbum(pos));
     }
 
@@ -73,13 +71,13 @@ public class AlbumListActivity extends AppCompatActivity {
         startActivity(new Intent(this, AlbumActivity.class));
     }
 
-    private void addAlbum() {
+    private void addAlbum() throws IOException {
         Dialog dialog = new Dialog((AlbumListActivity.this));
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setCancelable(true);
         dialog.setContentView(R.layout.add_album);
 
-        EditText albumName = dialog.findViewById(R.id.add_album_name);
+        EditText albumName = dialog.findViewById(R.id.edit_text);
         Button submitButton = dialog.findViewById(R.id.submit_button);
         TextView errorText = dialog.findViewById(R.id.error_text);
 
@@ -88,6 +86,8 @@ public class AlbumListActivity extends AppCompatActivity {
             public void onClick(View view) {
                 try {
                     albumList.add(new Album(albumName.getText().toString()));
+                    listAdapter.notifyDataSetChanged();
+                    albumList.save(getApplicationContext());
                     dialog.dismiss();
                 } catch (Exception e) {
                     errorText.setText(e.getMessage());
@@ -96,20 +96,80 @@ public class AlbumListActivity extends AppCompatActivity {
         });
 
         dialog.show();
+
+    }
+
+    private void deleteAlbum() throws IOException {
+        Dialog dialog = new Dialog((AlbumListActivity.this));
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(true);
+        dialog.setContentView(R.layout.delete_album);
+
+        Button submitButton = dialog.findViewById(R.id.submit_button);
+        TextView errorText = dialog.findViewById(R.id.error_text);
+        Spinner spinner = dialog.findViewById(R.id.spinner);
+
+        AtomicInteger idx = new AtomicInteger();
+
+
+        // Initialize spinner
+        ArrayAdapter<Album> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, albumList.list);
+        adapter.setDropDownViewResource(androidx.appcompat.R.layout.support_simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                submitButton.setEnabled(true);
+                idx.set(pos);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                submitButton.setEnabled(false);
+            }
+        });
+
+        // Initialize submit button
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int i = idx.get();
+                if (albumList.get(i).name.equalsIgnoreCase("stock")) {
+                    errorText.setText("Cannot delete stock album");
+                    return;
+                }
+                albumList.remove(i);
+                albumList.save(getApplicationContext());
+                listAdapter.notifyDataSetChanged();
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.add_menu, menu);
+        getMenuInflater().inflate(R.menu.album_list_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_add) {
-            addAlbum();
-            return true;
+        int itemId = item.getItemId();
+        try {
+            if (itemId == R.id.album_add) {
+                addAlbum();
+                return true;
+            }
+            if (itemId == R.id.album_delete) {
+                deleteAlbum();
+                return true;
+            }
+        } catch (IOException e) {
+            alertDialog(this, e);
         }
+
         return super.onOptionsItemSelected(item);
     }
 }

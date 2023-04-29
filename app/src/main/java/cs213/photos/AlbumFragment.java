@@ -46,7 +46,7 @@ public class AlbumFragment extends Fragment {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            recyclerView.setAdapter(new AlbumAdapter(Album.currentAlbum, listener));
+            recyclerView.setAdapter(new AlbumAdapter(Album.currentAlbum, context, listener));
         }
 
         return view;
