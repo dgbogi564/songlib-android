@@ -17,7 +17,6 @@ public class Album implements Serializable {
     private final Calendar latestDate = Calendar.getInstance();
     public String name;
     public ArrayList<Photo> photos;
-    private int size;
 
     public Album(String name) {
         this.name = name;
@@ -31,7 +30,6 @@ public class Album implements Serializable {
             throw new Exception("Photo already exists.");
         }
         photos.add(new Photo(filepath));
-        size++;
         calculateTimeStats();
     }
 
@@ -40,7 +38,6 @@ public class Album implements Serializable {
             throw new Exception("Photo already exists.");
         }
         photos.add(new Photo(context, uri));
-        size++;
         calculateTimeStats();
     }
 
@@ -49,20 +46,18 @@ public class Album implements Serializable {
     }
 
     public void remove(Photo photo) {
-        if (size == 0) {
+        if (photos.size() == 0) {
             return;
         }
         this.photos.remove(photo);
-        size--;
         calculateTimeStats();
     }
 
     public void remove(int pos) {
-        if (size == 0) {
+        if (photos.size() == 0) {
             return;
         }
         this.photos.remove(pos);
-        size--;
         calculateTimeStats();
     }
 
@@ -104,7 +99,7 @@ public class Album implements Serializable {
     }
 
     public Integer getSize() {
-        return size;
+        return photos.size();
     }
 
     public String getEarliestDate() {

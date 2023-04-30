@@ -2,12 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/save_as_album"
+        android:title="@string/save_as_album"
+        app:showAsAction="ifRoom|collapseActionView" />
+    <item
         android:id="@+id/delete"
         android:title="@string/delete"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom|collapseActionView" />
     <item
         android:id="@+id/add"
         android:icon="@drawable/ic_action_plus"
         android:title="@string/add"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom|collapseActionView" />
 </menu>

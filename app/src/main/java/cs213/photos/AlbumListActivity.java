@@ -3,11 +3,9 @@ package cs213.photos;
 import static cs213.photos.model.State.currentAlbum;
 import static cs213.photos.model.State.currentAlbumList;
 
-import android.Manifest;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.AssetManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,8 +34,8 @@ import cs213.photos.model.Tag.Type;
 
 public class AlbumListActivity extends AppCompatActivity {
     public static final String saveLocation = "photos.dat";
-    private ListView listView;
-    private ArrayAdapter<Album> listAdapter;
+    ListView listView;
+    ArrayAdapter<Album> listAdapter;
     private AlbumList albumList;
 
     @Override
@@ -57,6 +55,10 @@ public class AlbumListActivity extends AppCompatActivity {
             for (String path : assets.list("photos")) {
                 album.add("file:///android_asset/photos/" + path);
             }
+            for (Photo photo : album.photos) {
+                photo.addTag(Type.location, "locationTest");
+                photo.addTag(Type.person, "personTest");
+            }
             albumList.add(album);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -69,8 +71,15 @@ public class AlbumListActivity extends AppCompatActivity {
         listView.setOnItemClickListener((list, view, pos, id) -> showAlbum(pos));
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        listAdapter.notifyDataSetChanged();
+    }
+
     private void showAlbum(int pos) {
         currentAlbum = albumList.get(pos);
+        AlbumActivity.isResult = false;
         startActivity(new Intent(this, AlbumActivity.class));
     }
 
@@ -152,12 +161,12 @@ public class AlbumListActivity extends AppCompatActivity {
                             boolean match2 = false;
                             for (Tag tag : photo.tags) {
                                 if (Type.values()[idx1.get()] == tag.type) {
-                                    if (tag.value.equals(value1)) {
+                                    if (tag.value.equalsIgnoreCase(value1)) {
                                         match1 = true;
                                     }
                                 }
                                 if (Type.values()[idx2.get()] == tag.type) {
-                                    if (tag.value.equals(value2)) {
+                                    if (tag.value.equalsIgnoreCase(value2)) {
                                         match2 = true;
                                     }
                                 }
@@ -176,13 +185,13 @@ public class AlbumListActivity extends AppCompatActivity {
                             }
                             for (Tag tag : photo.tags) {
                                 if (Type.values()[idx1.get()] == tag.type) {
-                                    if (tag.value.equals(value1)) {
+                                    if (tag.value.equalsIgnoreCase(value1)) {
                                         searchResult.add(photo);
                                         break;
                                     }
                                 }
                                 if (Type.values()[idx2.get()] == tag.type) {
-                                    if (tag.value.equals(value2)) {
+                                    if (tag.value.equalsIgnoreCase(value2)) {
                                         searchResult.add(photo);
                                         break;
                                     }
@@ -193,8 +202,9 @@ public class AlbumListActivity extends AppCompatActivity {
                 }
 
                 currentAlbum = searchResult;
+                AlbumActivity.isResult = true;
                 dialog.dismiss();
-                startActivity(new Intent(AlbumListActivity.this, SearchActivity.class));
+                startActivity(new Intent(AlbumListActivity.this, AlbumActivity.class));
             }
         });
 

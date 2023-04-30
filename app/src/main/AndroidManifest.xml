@@ -15,10 +15,6 @@
         android:theme="@style/Theme.Photos"
         tools:targetApi="31">
         <activity
-            android:name=".SearchActivity"
-            android:exported="false"
-            android:parentActivityName="cs213.photos.AlbumListActivity" />
-        <activity
             android:name=".PhotoActivity"
             android:exported="false"
             android:parentActivityName="cs213.photos.AlbumActivity" />

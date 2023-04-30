@@ -14,7 +14,6 @@ import java.util.ArrayList;
 public class AlbumList implements Serializable {
     private static final String saveLocation = "photos.dat";
     public ArrayList<Album> list = new ArrayList<>();
-    public int size = 0;
 
     public static AlbumList load(Context context) {
         AlbumList albumList;
@@ -32,35 +31,31 @@ public class AlbumList implements Serializable {
             throw new Exception("Album with the same name already exists.");
         }
         list.add(album);
-        size++;
     }
 
     public void remove(Album album) {
-        if (size == 0) {
+        if (list.size() == 0) {
             return;
         }
         this.list.remove(album);
-        size--;
     }
 
     public void remove(String name) {
-        if (size == 0) {
+        if (list.size() == 0) {
             return;
         }
         this.list.remove(get(name));
-        size--;
     }
 
     public void remove(int pos) {
-        if (size == 0) {
+        if (list.size() == 0) {
             return;
         }
         this.list.remove(pos);
-        size--;
     }
 
     public Album get(String name) {
-        if (size == 0) {
+        if (list.size() == 0) {
             return null;
         }
         return list.stream().filter(p -> p.name.equalsIgnoreCase(name)).findFirst().orElse(null);
@@ -77,6 +72,4 @@ public class AlbumList implements Serializable {
             alertDialog(context, e);
         }
     }
-
-
 }

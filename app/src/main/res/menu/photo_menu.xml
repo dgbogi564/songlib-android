@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/add_tag"
+        android:id="@+id/add"
         android:title="@string/add_tag"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom|collapseActionView" />
 
     <item
-        android:id="@+id/delete_tag"
+        android:id="@+id/delete"
         android:title="@string/delete_tag"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom|collapseActionView" />
 </menu>

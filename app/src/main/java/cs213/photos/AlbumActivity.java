@@ -16,6 +16,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -32,12 +33,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import cs213.photos.model.Album;
+import cs213.photos.model.AlbumList;
 import cs213.photos.model.Photo;
 import cs213.photos.model.State;
 
 public class AlbumActivity extends AppCompatActivity implements AlbumFragment.OnListFragmentInteractionListener {
 
     public static Album album;
+    public static AlbumList albumList;
+    public static boolean isResult = false;
     private RecyclerView.Adapter recyclerViewAdapter;
     private RecyclerView recyclerView;
     ActivityResultLauncher<Intent> photoResultLauncher = registerForActivityResult(
@@ -56,7 +60,7 @@ public class AlbumActivity extends AppCompatActivity implements AlbumFragment.On
                                         | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                                 album.add(AlbumActivity.this, uri);
                                 recyclerViewAdapter.notifyItemInserted(album.getSize() - 1);
-                                currentAlbumList.save(AlbumActivity.this);
+                                albumList.save(AlbumActivity.this);
                             } catch (Exception e) {
                                 alertDialog(AlbumActivity.this, e);
                             }
@@ -75,6 +79,7 @@ public class AlbumActivity extends AppCompatActivity implements AlbumFragment.On
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         album = currentAlbum;
+        albumList = currentAlbumList;
     }
 
     @Override
@@ -94,6 +99,14 @@ public class AlbumActivity extends AppCompatActivity implements AlbumFragment.On
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.album_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu (Menu menu) {
+        menu.findItem(R.id.save_as_album).setVisible(isResult);
+        menu.findItem(R.id.add).setVisible(!isResult);
+        menu.findItem(R.id.delete).setVisible(!isResult);
         return true;
     }
 
@@ -145,9 +158,36 @@ public class AlbumActivity extends AppCompatActivity implements AlbumFragment.On
             public void onClick(View view) {
                 int i = idx.get();
                 album.remove(i);
-                currentAlbumList.save(getApplicationContext());
+                albumList.save(getApplicationContext());
                 recyclerViewAdapter.notifyItemRangeRemoved(i, 1);
                 dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void saveAsAlbum() {
+        Dialog dialog = new Dialog((this));
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(true);
+        dialog.setContentView(R.layout.save_as_album);
+
+        EditText albumName = dialog.findViewById(R.id.edit_text);
+        Button submitButton = dialog.findViewById(R.id.submit_button);
+        TextView errorText = dialog.findViewById(R.id.error_text);
+
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    album.name = albumName.getText().toString();
+                    albumList.add(album);
+                    albumList.save(getApplicationContext());
+                    dialog.dismiss();
+                } catch (Exception e) {
+                    errorText.setText(e.getMessage());
+                }
             }
         });
 
@@ -163,6 +203,10 @@ public class AlbumActivity extends AppCompatActivity implements AlbumFragment.On
         }
         if (itemId == R.id.delete) {
             deletePhoto();
+            return true;
+        }
+        if (item.getItemId() == R.id.save_as_album) {
+            saveAsAlbum();
             return true;
         }
         return super.onOptionsItemSelected(item);

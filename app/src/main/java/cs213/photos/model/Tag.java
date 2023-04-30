@@ -1,5 +1,7 @@
 package cs213.photos.model;
 
+import androidx.annotation.NonNull;
+
 import java.io.Serializable;
 
 public class Tag implements Serializable {
@@ -14,6 +16,12 @@ public class Tag implements Serializable {
 
     public enum Type {
         person,
-        location
+        location;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "Type: " + type.name() + ", Value: " + value;
     }
 }

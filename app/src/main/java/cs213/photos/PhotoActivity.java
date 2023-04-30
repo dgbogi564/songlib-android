@@ -3,12 +3,9 @@ package cs213.photos;
 import static cs213.photos.model.State.currentAlbumList;
 import static cs213.photos.model.State.currentPhoto;
 
-import android.Manifest;
 import android.app.Dialog;
-import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,7 +20,6 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -93,7 +89,7 @@ public class PhotoActivity extends AppCompatActivity {
         Dialog dialog = new Dialog((this));
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setCancelable(true);
-        dialog.setContentView(R.layout.rename_album);
+        dialog.setContentView(R.layout.add_tag);
 
         Button submitButton = dialog.findViewById(R.id.submit_button);
         EditText value_et = dialog.findViewById(R.id.edit_text);
@@ -123,9 +119,10 @@ public class PhotoActivity extends AppCompatActivity {
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String value = value_et.toString().trim();
+                String value = value_et.getText().toString().trim();
                 if (value.length() == 0) {
                     errorText.setText("Value field not filled.");
+                    return;
                 }
                 Type type = Type.values()[idx.get()];
 
