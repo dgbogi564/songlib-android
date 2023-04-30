@@ -11,4 +11,16 @@
     <string name="created_at">Created At:</string>
     <string name="select">Select</string>
     <string name="delete_photo">Delete Photo</string>
+    <string name="search">Search</string>
+    <string name="save_as_album">Save As Album</string>
+    <string name="rename">Rename</string>
+    <string name="rename_album">Rename Album</string>
+    <string name="add_tag">Add Tag</string>
+    <string name="delete_tag">Delete Tag</string>
+    <string name="save">Save</string>
+    <string name="tag_types">Tag Types</string>
+    <string name="values">Values</string>
+    <string name="value">Value</string>
+    <string name="value_required">Value (required)</string>
+    <string name="conjunctive_search">Conjunctive Search?</string>
 </resources>

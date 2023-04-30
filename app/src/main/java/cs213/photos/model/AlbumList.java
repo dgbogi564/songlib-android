@@ -3,6 +3,7 @@ package cs213.photos.model;
 import static cs213.photos.model.ErrorHandling.alertDialog;
 
 import android.content.Context;
+import android.net.Uri;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -11,11 +12,20 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class AlbumList implements Serializable {
-    public ArrayList<Album> list = new ArrayList<>();
-
     private static final String saveLocation = "photos.dat";
-
+    public ArrayList<Album> list = new ArrayList<>();
     public int size = 0;
+
+    public static AlbumList load(Context context) {
+        AlbumList albumList;
+        try (ObjectInputStream ois = new ObjectInputStream(context.openFileInput(saveLocation))) {
+            albumList = (cs213.photos.model.AlbumList) ois.readObject();
+            albumList.remove("Stock");
+        } catch (IOException | ClassNotFoundException e) {
+            albumList = new AlbumList();
+        }
+        return albumList;
+    }
 
     public void add(Album album) throws Exception {
         if (get(album.name) != null) {
@@ -66,17 +76,6 @@ public class AlbumList implements Serializable {
         } catch (IOException e) {
             alertDialog(context, e);
         }
-    }
-
-    public static AlbumList load(Context context) {
-        AlbumList albumList;
-        try (ObjectInputStream ois = new ObjectInputStream(context.openFileInput(saveLocation))) {
-            albumList = (cs213.photos.model.AlbumList) ois.readObject();
-            albumList.remove("Stock");
-        } catch (IOException | ClassNotFoundException e) {
-            albumList = new AlbumList();
-        }
-        return albumList;
     }
 
 

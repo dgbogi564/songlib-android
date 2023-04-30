@@ -12,9 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import cs213.photos.model.Album;
 import cs213.photos.model.Photo;
-import cs213.photos.model.State;
 
 /**
  * A fragment representing a list of Items.

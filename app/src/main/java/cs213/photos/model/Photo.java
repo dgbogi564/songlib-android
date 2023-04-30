@@ -1,14 +1,11 @@
 package cs213.photos.model;
-;
 
 import android.content.Context;
 import android.net.Uri;
 
 import androidx.documentfile.provider.DocumentFile;
 
-import java.io.File;
 import java.io.Serializable;
-import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;

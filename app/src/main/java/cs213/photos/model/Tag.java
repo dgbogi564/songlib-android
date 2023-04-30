@@ -12,7 +12,7 @@ public class Tag implements Serializable {
         this.value = value;
     }
 
-    enum Type {
+    public enum Type {
         person,
         location
     }

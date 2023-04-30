@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -43,28 +42,32 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         Photo photo = album.get(position);
-
-        holder.photo = photo;
-        Drawable drawable;
+        String path = photo.filepath.startsWith("file:///")
+                ? photo.filepath.substring(22)
+                : photo.filepath;
         Context context = holder.imageView.getContext();
-        if (photo.filepath.startsWith("file:///")) {
-            try (InputStream is = context.getAssets().open(photo.filepath.substring(22))) {
-                drawable = Drawable.createFromStream(is, null);
+
+        // Set holder values
+        holder.photo = photo;
+        holder.name_text_view.setText(photo.toString());
+        holder.dateView.setText(photo.getDate());
+
+        if (path.startsWith("content://")) {
+            Uri uri = Uri.parse(path);
+            try (InputStream is = context.getContentResolver().openInputStream(uri)) {
+                holder.imageView.setImageDrawable(Drawable.createFromStream(is, null));
             } catch (IOException e) {
                 ErrorHandling.alertDialog(context, e);
                 return;
             }
         } else {
-            try (InputStream is = context.getContentResolver().openInputStream(Uri.parse(photo.filepath))) {
-                drawable = Drawable.createFromStream(is, null);
+            try (InputStream is = context.getAssets().open(path)) {
+                holder.imageView.setImageDrawable(Drawable.createFromStream(is, null));
             } catch (IOException e) {
                 ErrorHandling.alertDialog(context, e);
                 return;
             }
         }
-        holder.imageView.setImageDrawable(drawable);
-        holder.name_text_view.setText(photo.toString());
-        holder.dateView.setText(photo.getDate());
 
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override

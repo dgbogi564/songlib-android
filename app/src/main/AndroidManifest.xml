@@ -4,8 +4,6 @@
     android:hardwareAccelerated="false"
     android:largeHeap="true">
 
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -17,9 +15,17 @@
         android:theme="@style/Theme.Photos"
         tools:targetApi="31">
         <activity
+            android:name=".SearchActivity"
+            android:exported="false"
+            android:parentActivityName="cs213.photos.AlbumListActivity" />
+        <activity
+            android:name=".PhotoActivity"
+            android:exported="false"
+            android:parentActivityName="cs213.photos.AlbumActivity" />
+        <activity
             android:name=".AlbumActivity"
             android:exported="false"
-            android:parentActivityName="cs213.photos.AlbumActivity"/>
+            android:parentActivityName="cs213.photos.AlbumActivity" />
         <activity
             android:name=".AlbumListActivity"
             android:exported="true">
@@ -29,5 +35,9 @@
             </intent-filter>
         </activity>
     </application>
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
 </manifest>

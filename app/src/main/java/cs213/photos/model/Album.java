@@ -5,7 +5,6 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
-import java.io.InputStream;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -14,10 +13,10 @@ import java.util.Calendar;
 public class Album implements Serializable {
 
     private static final DateFormat dateFormat = DateFormat.getDateInstance();
-    public String name;
-    public ArrayList<Photo> photos;
     private final Calendar earliestDate = Calendar.getInstance();
     private final Calendar latestDate = Calendar.getInstance();
+    public String name;
+    public ArrayList<Photo> photos;
     private int size;
 
     public Album(String name) {
@@ -31,7 +30,7 @@ public class Album implements Serializable {
         if (get(filepath) != null) {
             throw new Exception("Photo already exists.");
         }
-        this.photos.add(new Photo(filepath));
+        photos.add(new Photo(filepath));
         size++;
         calculateTimeStats();
     }
@@ -40,9 +39,13 @@ public class Album implements Serializable {
         if (get(uri.toString()) != null) {
             throw new Exception("Photo already exists.");
         }
-        this.photos.add(new Photo(context, uri));
+        photos.add(new Photo(context, uri));
         size++;
         calculateTimeStats();
+    }
+
+    public void add(Photo photo) {
+        photos.add(photo);
     }
 
     public void remove(Photo photo) {
@@ -53,6 +56,7 @@ public class Album implements Serializable {
         size--;
         calculateTimeStats();
     }
+
     public void remove(int pos) {
         if (size == 0) {
             return;
